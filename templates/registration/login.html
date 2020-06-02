@@ -1,0 +1,44 @@
+{% extends 'stories/base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+{% if not user.is_authenticated %}
+
+<h1>Login here</h1>
+
+{% bootstrap_form_errors form %}
+
+{% if next %}
+
+  {% if user.is_authenticated %}
+    <p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+  {% endif %}
+
+{% endif %}
+
+
+<form action="{% url 'login' %}" method="post" class="form">
+  {% csrf_token %}
+  {% bootstrap_form form layout='horizontal' %}
+  {% buttons %}
+    <button type="submit" class="btn btn-primary">
+      Login
+    </button>
+  {% endbuttons %}
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+<p><a href="{% url 'password_reset' %}">Lost password?</a></p>
+
+    <p><a href="{% url 'register' %}">Don't have an account? Register.</a></p>
+
+{% else %}
+
+<p>You are already logged in. <a href="{% url 'home' %}">Go home.</a></p>
+
+{% endif %}
+
+
+{% endblock %}

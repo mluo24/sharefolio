@@ -1,0 +1,38 @@
+<!DOCTYPE html>{% load static bootstrap4 tz %}
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>{% block page_title %}{% endblock %}Story Share</title>
+
+    {% bootstrap_css %}
+    <link href="{% static 'stories/css/style.css' %}" type="text/css" rel="stylesheet">
+    {% block custom_styles %}{% endblock %}
+
+</head>
+
+<body>
+
+{% include 'stories/partials/header.html' %}
+
+<main id="content">
+    {% localtime on %}
+<div class="container">
+
+{% block content %} {% endblock %}
+
+</div>
+    {% endlocaltime %}
+</main>
+
+{% include 'stories/partials/footer.html' %}
+
+{% bootstrap_javascript jquery='full' %}
+{% block custom_scripts %}{% endblock %}
+
+</body>
+
+</html>

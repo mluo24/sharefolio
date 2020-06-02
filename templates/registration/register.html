@@ -1,0 +1,27 @@
+{% extends 'stories/base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+{% if not user.is_authenticated %}
+
+    <h1>Sign Up</h1>
+    {% bootstrap_form_errors form %}
+
+    <form action="{% url 'register' %}" method="post" class="form">
+      {% csrf_token %}
+      {% bootstrap_form form layout='horizontal' %}
+      {% buttons %}
+        <button type="submit" class="btn btn-primary">
+          Register
+        </button>
+      {% endbuttons %}
+    </form>
+
+{% else %}
+
+<p>You are already logged in. <a href="{% url 'home' %}">Go home.</a></p>
+
+{% endif %}
+
+{% endblock %}
