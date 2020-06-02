@@ -1,0 +1,15 @@
+{% extends 'stories/base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<h1>Create New Story</h1>
+
+<form action="" method="POST">
+{% csrf_token %}
+{% bootstrap_form form %}
+{% buttons %}
+{% bootstrap_button "Create" button_type="submit" button_class="btn-primary" %}
+{% endbuttons %}
+</form>
+{% endblock %}

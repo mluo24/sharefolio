@@ -1,0 +1,11 @@
+{% load humanize %}
+<div class="list-group-item flex-column align-items-start">
+            <div class="d-flex w-100 justify-content-between">
+                <h5 class="mb-1"><a href="{{ story.get_absolute_url }}">{{ story.title }}</a> by <a href="{% url 'profile' story.author.username %}">{{ story.author.username }}</a> ({{ story.category }})</h5>
+              <small>Last updated: {{ story.updated_at|naturaltime }}</small>
+            </div>
+            {% if request.get_full_path == "/mystories/" %} <a href="{% url 'story.edit' story.id %}" class="btn btn-primary">Edit</a>  {% endif %}
+    <!--<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#edit{{ forloop.counter }}">Edit</button>-->
+            <p class="mb-1">{{ story.description }}</p>
+            <small>{{ story.get_num_chapters }} chapters &middot; Status: {{ story.status }} &middot; First posted: {{ story.created_at }} &middot; Word count: {{ story.get_word_count }} &middot; Likes: {{ story.get_total_likes }}</small>
+</div>

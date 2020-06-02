@@ -1,0 +1,41 @@
+{% extends 'stories/base.html' %}
+{% load bootstrap4 %}
+
+{% block content %}
+
+<h1>Edit {{ story.title }}</h1>
+
+<ul class="nav nav-tabs" id="updatestoryforms" role="tablist">
+  <li class="nav-item">
+    <a class="nav-link active" id="story-tab" data-toggle="tab" href="#storydetails" role="tab" aria-controls="storydetails" aria-selected="true">Story Details</a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" id="chapter-tab" data-toggle="tab" href="#chapterlist" role="tab" aria-controls="chapterlist" aria-selected="false">Chapter List</a>
+  </li>
+</ul>
+
+
+<form action="" method="POST">
+    <div class="tab-content" id="myTabContent">
+    <div class="tab-pane active" id="storydetails" role="tabpanel" aria-labelledby="story-tab">
+
+{% csrf_token %}
+{% bootstrap_form form %}
+{% buttons %}
+{% bootstrap_button "Update" button_type="submit" button_class="btn-primary" %}
+{% endbuttons %}
+
+    </div>
+        <div class="tab-pane" id="chapterlist" role="tabpanel" aria-labelledby="chapter-tab">
+            {% if story.get_chapters > 0 %}
+          <ul>
+    {% for chapter in story.get_chapters %}
+    <li>{{ forloop.counter }} - {{ chapter.title }}</li>
+    {% endfor %}
+</ul>
+            {% endif %}
+            <a href="{% url 'chapter.new' story.pk %}" class="btn btn-primary">Add New</a>
+      </div>
+    </div>
+</form>
+{% endblock %}

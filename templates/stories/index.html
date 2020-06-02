@@ -1,0 +1,26 @@
+{% extends 'stories/base.html' %}
+
+{% block content %}
+
+{% if stories.count > 0 %}
+    <div class="list-group list-group-flush">
+{% for story in stories %}
+        {% if story.is_valid_story %}
+
+        {% include 'stories/partials/list_story.html' %}
+
+        {% endif %}
+
+        <!--<div class="list-group-item flex-column align-items-start">-->
+            <!--<div class="d-flex w-100 justify-content-between">-->
+                <!--<h5 class="mb-1"><a href="{% url 'story' story.id story.slug %}">{{ story.title }}</a> by {{ story.author.username }} ({{ story.categories.first }})</h5>-->
+              <!--<small>Last updated: {{ story.updated_at }}</small>-->
+            <!--</div>-->
+            <!--<p class="mb-1">{{ story.description }}</p>-->
+            <!--<small>{{ story.get_num_chapters }} chapters &middot; Status: {{ story.status }} &middot; First posted: {{ story.created_at }} &middot; Likes: {{ story.likes }}</small>-->
+        <!--</div>-->
+
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

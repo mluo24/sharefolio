@@ -1,0 +1,43 @@
+{% extends 'stories/base.html' %}
+
+{% block content %}
+
+<h1>My Stories</h1>
+
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if stories.count > 0 %}
+    <div class="list-group list-group-flush">
+{% for story in stories %}
+
+        {% include 'stories/partials/list_story.html' %}
+
+{% endfor %}
+      <!--<div class="modal fade" id="edit{{ forloop.counter }}" tabindex="-1" role="dialog" aria-hidden="true">-->
+          <!--<div class="modal-dialog" role="document">-->
+            <!--<div class="modal-content">-->
+              <!--<div class="modal-header">-->
+                <!--<h5 class="modal-title">Modal title</h5>-->
+                <!--<button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+                  <!--<span aria-hidden="true">&times;</span>-->
+                <!--</button>-->
+              <!--</div>-->
+              <!--<div class="modal-body">-->
+                <!--...-->
+              <!--</div>-->
+              <!--<div class="modal-footer">-->
+                <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                <!--<button type="button" class="btn btn-primary">Save changes</button>-->
+              <!--</div>-->
+            <!--</div>-->
+          <!--</div>-->
+        <!--</div>-->
+</div>
+{% endif %}
+{% endblock %}

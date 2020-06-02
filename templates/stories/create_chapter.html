@@ -1,0 +1,30 @@
+{% extends 'stories/base.html' %}
+{% load bootstrap4 %}
+
+{% block custom_styles %}
+    <style>
+        .django-ckeditor-widget {
+            display: block !important;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+<h1>Create New Chapter for {{ story.title }}</h1>
+
+<form action="" method="POST">
+{% csrf_token %}
+    <input type="hidden" name="parent_story" value="{{ story.id }}">
+{% bootstrap_form form %}
+{% buttons %}
+{% bootstrap_button "Create" button_type="submit" button_class="btn-primary" %}
+{% endbuttons %}
+</form>
+
+{% endblock %}
+
+{% block custom_scripts %}
+{% load static %}
+<script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
+<script type="text/javascript" src="{% static "ckeditor/ckeditor/ckeditor.js" %}"></script>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends 'stories/base.html' %}
+
+{% block content %}
+
+<p><a href="{{ story.get_absolute_url }}">Back to chapters</a></p>
+
+<h1>{{ chapter.title }}</h1>
+<small>Created on {{ chapter.created_at }}</small>
+
+{% autoescape off %}
+{{ chapter.body }}
+{% endautoescape %}
+
+{% endblock %}

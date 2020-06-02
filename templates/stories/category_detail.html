@@ -1,0 +1,16 @@
+{% extends 'stories/base.html' %}
+
+{% block content %}
+<h1>{{ category.name }}</h1>
+<p>{{ category.description }}</p>
+
+<h2>{{ category.get_stories.count }} Stories Found</h2>
+    <div class="list-group list-group-flush">
+
+{% for story in category.get_stories %}
+
+       {% include 'stories/partials/list_story.html' %}
+
+{% endfor %}
+    </div>
+{% endblock %}
