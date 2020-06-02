@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+# accounts and main site and stuff
 urlpatterns = [
     path('', views.home, name="home"),
     path('user/<slug:slug>', views.UserProfileView.as_view(), name="profile"),
