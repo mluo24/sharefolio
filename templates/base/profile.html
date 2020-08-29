@@ -1,8 +1,30 @@
 {% extends 'stories/base.html' %}
+{% load bootstrap4 %}
 {% block content %}
 
-<h1>User Profile For: {{user.username}}</h1>
+<h1>User Profile For: {{pageuser.username}}</h1>
 
+<ul>
+    <li>Date joined: {{ pageuser.date_joined }}</li>
+    <li>Full name: {{ pageuser.get_full_name }}</li>
+    <li>Location: {{ pageuser.userprofile.location }}</li>
+    <li>Bio: {{ pageuser.userprofile.bio }}</li>
+</ul>
 
+        {% if user.pk == pageuser.pk %}
+        <a href="{% url 'profile.edit' pageuser.username %}" class="btn btn-primary">Edit Profile</a>
+    {% endif %}
+
+    <h3>{{ pageuser.story_set.count }} stor{{ pageuser.story_set.count|pluralize:"y,ies" }} written by {{pageuser.username}}</h3>
+
+    {% if pageuser.story_set.count > 0 %}
+    <div class="list-group list-group-flush">
+        {% for story in pageuser.story_set.all %}
+
+                {% include 'stories/partials/list_story.html' %}
+
+        {% endfor %}
+    </div>
+    {% endif %}
 
 {% endblock %}

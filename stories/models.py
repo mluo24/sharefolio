@@ -1,5 +1,4 @@
-import datetime
-
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils.text import slugify
 from django.utils.html import strip_tags
@@ -7,6 +6,7 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from ckeditor.fields import RichTextField
 from django.urls import reverse
+from hitcount.models import HitCount, HitCountMixin
 from taggit.managers import TaggableManager
 
 
@@ -21,13 +21,8 @@ class Category(models.Model):
         list_of_pks = []
         story_set = self.story_set.all()
         for story in story_set:
-            chapters = Chapter.objects.filter(parent_story=story)
-            for chapter in chapters:
-                is_valid = False
-                if chapter.status != "draft":
-                    is_valid = True
-                if not is_valid:
-                    list_of_pks.append(story.pk)
+            if story.get_chapters().count() == 0:
+                list_of_pks.append(story.pk)
         return self.story_set.exclude(pk__in=list_of_pks)
 
     def __str__(self):
@@ -57,13 +52,13 @@ class Story(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=9, choices=STATUS_LIST, default='ongoing')
     # add image field here
-    # add num likes here
-    # add bookmarks here
-    # add views here
+    cover = models.ImageField(upload_to='user_uploads/covers', default='noimage.png')
+    bookmarks = models.ManyToManyField(User, blank=True, related_name="story_bookmarks", verbose_name='bookmarks')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=False)
     tags = TaggableManager()
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(default=timezone.now)
+    # distinguish publish vs created
+    created_at = models.DateTimeField()
+    updated_at = models.DateTimeField(auto_now=True)
 
     def get_chapters_including_draft(self):
         return self.chapter_set.all()
@@ -74,7 +69,7 @@ class Story(models.Model):
 
     # gets the set of drafts
     def get_drafts(self):
-        pass
+        return self.chapter_set.filter(status="draft")
 
     def get_num_chapters_including_draft(self):
         return self.get_chapters_including_draft().count()
@@ -86,9 +81,14 @@ class Story(models.Model):
     def get_word_count(self):
         words = 0
         for chapter in self.get_chapters():
-            current_text = strip_tags(chapter.body)
-            words += len(current_text.split())
+            words += chapter.get_words()
         return words
+
+    def get_total_views(self):
+        total_views = 0
+        for chapter in self.get_chapters():
+            total_views += chapter.hit_count.hits
+        return total_views
 
     def is_valid_story(self):
         return self.get_num_chapters() > 0
@@ -96,7 +96,8 @@ class Story(models.Model):
     def get_total_likes(self):
         total_likes = 0
         for chapter in self.chapter_set.all():
-            total_likes += chapter.likes
+            if chapter.likes is not None or chapter.likes != "":
+                total_likes += chapter.likes.count()
         return total_likes
 
     def get_absolute_url(self):
@@ -111,11 +112,13 @@ class Story(models.Model):
         verbose_name_plural = "stories"
 
     def save(self, *args, **kwargs):
+        if not self.pk:
+            self.created_at = timezone.now()
         self.slug = slugify(self.title)
         super(Story, self).save(*args, **kwargs)
 
 
-class Chapter(models.Model):
+class Chapter(models.Model, HitCountMixin):
     STATUS_LIST = (
         ('draft', 'Draft'),
         ('public', 'Public'),
@@ -127,11 +130,12 @@ class Chapter(models.Model):
     description = models.TextField(null=True, blank=False)
     body = RichTextField(config_name='normal', null=True, blank=False)
     status = models.CharField(max_length=6, choices=STATUS_LIST, default='draft')
-    likes = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now=True)
-
-    # def get_word_count(self):
-    #     return 0
+    likes = models.ManyToManyField(User, blank=True, related_name="chapter_likes", verbose_name='likes')
+    hit_count_generic = GenericRelation(HitCount, object_id_field='object_pk',
+                                        related_query_name='hit_count_generic_relation')
+    # distinguish publish vs created
+    created_at = models.DateTimeField()
+    # published_at = models.DateTimeField()
 
     def __str__(self):
         if self.title:
@@ -142,18 +146,21 @@ class Chapter(models.Model):
     def get_absolute_url(self):
         return reverse('chapter', args=[str(self.parent_story.id), str(self.parent_story.slug), str(self.id)])
 
-    def get_num_characters(self):
-        # figure out how to return num characters in body field
-        pass
+    def get_words(self):
+        return len(strip_tags(self.body).split())
+
+    def get_like_url(self):
+        return reverse('liketoggle', args=[str(self.parent_story.id), str(self.parent_story.slug), str(self.id)])
 
     def save(self, *args, **kwargs):
         if not self.id:
+            self.created_at = timezone.now()
             latest_chapter = Chapter.objects.filter(parent_story__chapter__parent_story=self.parent_story).order_by("-order").first()
             if latest_chapter is None:
                 self.order = 1
             else:
                 self.order = latest_chapter.order + 1
-            self.parent_story.updated_at = timezone.now()
+        if self.status != "draft":
             self.parent_story.save()
         super(Chapter, self).save(*args, **kwargs)
 

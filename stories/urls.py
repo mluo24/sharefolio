@@ -5,6 +5,7 @@ urlpatterns = [
     path('stories/', views.StoriesView.as_view(), name="index"),
     path('stories/<int:pk>/<slug:slug>', views.StoryDetail.as_view(), name="story"),
     path('stories/<int:pk>/<slug:slug>/c/<int:chapter>', views.ChapterDetail.as_view(), name="chapter"),
+    path('stories/<int:pk>/<slug:slug>/c/<int:chapter>/like', views.ChapterLikeToggle.as_view(), name="liketoggle"),
     path('mystories/', views.MyStoryView.as_view(), name="mystories"),
     path('mystories/new', views.StoryCreateView.as_view(), name="story.new"),
     path('mystories/<int:pk>/edit', views.StoryUpdateView.as_view(), name="story.edit"),

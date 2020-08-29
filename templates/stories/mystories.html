@@ -39,5 +39,8 @@
           <!--</div>-->
         <!--</div>-->
 </div>
+
+    {% else %}
+    <p>No stories found. <a href="{% url 'story.new' %}">Maybe make one?</a></p>
 {% endif %}
 {% endblock %}

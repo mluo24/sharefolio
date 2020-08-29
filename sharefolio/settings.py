@@ -39,18 +39,27 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django.contrib.sites',
+
+    'django_comments',
+    'threadedcomments',
 
     'stories',
     'base',
 
     'hitcount',
     'taggit',
+    "friendship",
     'django_extensions',
     'ckeditor',
     'ckeditor_uploader',
     'bootstrap4',
     'rest_framework',
 ]
+
+SITE_ID = 1
+
+COMMENTS_APP = 'threadedcomments'
 
 TAGGIT_CASE_INSENSITIVE = True
 
@@ -250,3 +259,9 @@ STATICFILES_DIRS = (
 )
 
 # STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

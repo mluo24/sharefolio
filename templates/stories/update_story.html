@@ -27,13 +27,11 @@
 
     </div>
         <div class="tab-pane" id="chapterlist" role="tabpanel" aria-labelledby="chapter-tab">
-            {% if story.get_chapters > 0 %}
-          <ul>
-    {% for chapter in story.get_chapters %}
-    <li>{{ forloop.counter }} - {{ chapter.title }}</li>
-    {% endfor %}
-</ul>
-            {% endif %}
+            <ul>
+                {% for chapter in story.get_chapters_including_draft %}
+                    <li><a href="{%  url 'chapter.update' story.pk chapter.pk %}">{{ forloop.counter }} - {{ chapter.title }}</a> {% if chapter.status == "draft" %} (Draft) {% endif %}</li>
+                {% endfor %}
+            </ul>
             <a href="{% url 'chapter.new' story.pk %}" class="btn btn-primary">Add New</a>
       </div>
     </div>

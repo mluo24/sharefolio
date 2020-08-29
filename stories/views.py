@@ -4,7 +4,9 @@ from django.urls import reverse_lazy
 # from django.contrib.sessions.models import Session
 # from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
+from hitcount.views import HitCountDetailView
+from friendship.models import Follow, Block
 from stories.models import Category, Story, Chapter
 # from .forms import CreateStoryForm, CreateChapterForm
 
@@ -17,7 +19,7 @@ class StoriesView(ListView):
     model = Story
     template_name = 'stories/index.html'
     context_object_name = 'stories'
-
+    
 
 class StoryDetail(DetailView):
     model = Story
@@ -25,10 +27,11 @@ class StoryDetail(DetailView):
     query_pk_and_slug = True
 
 
-class ChapterDetail(DetailView):
+class ChapterDetail(HitCountDetailView):
     model = Chapter
     context_object_name = 'chapter'
     pk_url_kwarg = 'chapter'
+    count_hit = True
 
     def get_object(self):
         self.story = get_object_or_404(Story, id=self.kwargs['pk'], slug=self.kwargs['slug'])
@@ -38,6 +41,20 @@ class ChapterDetail(DetailView):
         context = super().get_context_data(**kwargs)
         context['story'] = self.story
         return context
+
+
+class ChapterLikeToggle(RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        temp_story = get_object_or_404(Story, id=self.kwargs['pk'], slug=self.kwargs['slug'])
+        obj = get_object_or_404(Chapter, pk=self.kwargs['chapter'])
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_
 
 
 class MyStoryView(LoginRequiredMixin, ListView):
@@ -64,7 +81,7 @@ class CategoryDetailView(DetailView):
 class StoryCreateView(LoginRequiredMixin, CreateView):
     model = Story
     template_name = "stories/create_story.html"
-    fields = ['title', 'description', 'status', 'category', 'tags']
+    fields = ['title', 'description', 'cover', 'status', 'category', 'tags']
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
@@ -80,12 +97,12 @@ class StoryCreateView(LoginRequiredMixin, CreateView):
 class StoryUpdateView(LoginRequiredMixin, UpdateView):
     model = Story
     template_name = "stories/update_story.html"
-    fields = ['title', 'description', 'status', 'category', 'tags']
+    fields = ['title', 'description', 'cover', 'status', 'category', 'tags']
 
 
 class StoryDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Story
-    template_name = ""
+    # template_name = ""
     success_url = reverse_lazy('mystories')
     success_message = "Successfully deleted story"
 
@@ -122,6 +139,6 @@ class ChapterUpdateView(LoginRequiredMixin, UpdateView):
 
 class ChapterDeleteView(LoginRequiredMixin, SuccessMessageMixin, DeleteView):
     model = Chapter
-    template_name = ""
+    # template_name = ""
     success_url = reverse_lazy('mystories')
     success_message = "Successfully deleted chapter"
