@@ -47,7 +47,7 @@ class Story(models.Model):
         ('completed', 'Completed'),
     )
     title = models.CharField(max_length=255)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField( blank=True)
     description = models.TextField()
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     status = models.CharField(max_length=9, choices=STATUS_LIST, default='ongoing')

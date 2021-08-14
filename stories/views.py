@@ -19,6 +19,7 @@ class StoriesView(ListView):
     model = Story
     template_name = 'stories/index.html'
     context_object_name = 'stories'
+    paginate_by = 20
 
 
 class StoryDetail(DetailView):
