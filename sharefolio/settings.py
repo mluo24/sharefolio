@@ -1,3 +1,5 @@
+from decouple import config
+
 """
 Django settings for sharefolio project.
 
@@ -20,11 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '-_$v2%mcd8hgo7*dv_wc1ks!w+3u29&xaq%_9*jj@9z629w4vv'
+SECRET_KEY = config('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = []
 
@@ -207,11 +209,11 @@ WSGI_APPLICATION = 'sharefolio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'sharefolio',
-        'USER': 'Miranda',
-        'PASSWORD': 'fandomness101319',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DATABASE_NAME'),
+        'USER': config('DATABASE_USER'),
+        'PASSWORD': config('DATABASE_PASSWORD'),
+        'HOST': config('DATABASE_HOST'),
+        'PORT': config('DATABASE_PORT'),
     }
 }
 

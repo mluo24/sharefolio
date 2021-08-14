@@ -19,7 +19,7 @@ class StoriesView(ListView):
     model = Story
     template_name = 'stories/index.html'
     context_object_name = 'stories'
-    
+
 
 class StoryDetail(DetailView):
     model = Story
@@ -84,14 +84,16 @@ class StoryCreateView(LoginRequiredMixin, CreateView):
     fields = ['title', 'description', 'cover', 'status', 'category', 'tags']
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
+        story = form.save(commit=False)
         # self.object.parent_story = Story.objects.get(pk=form.cleaned_data['parent_story'])
-        self.object.author = self.request.user
-        self.object.save()
-        self.chapter = Chapter(parent_story=self.object) # create new chapter
-        self.chapter.save()
-        self.success_url = reverse('chapter.update', kwargs={'pk': self.object.pk, 'chapter': self.chapter.pk})
-        return HttpResponseRedirect(self.get_success_url())
+        story.author = self.request.user
+        story.save()
+        form.save_m2m()  # for tags
+        chapter = Chapter(parent_story=story)  # create new chapter
+        chapter.save()
+        self.success_url = reverse('chapter.update', kwargs={'pk': story.pk, 'chapter': chapter.pk})
+        print(self.success_url)
+        return super().form_valid(form)
 
 
 class StoryUpdateView(LoginRequiredMixin, UpdateView):
@@ -118,9 +120,9 @@ class ChapterCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.parent_story = Story.objects.get(pk=self.request.POST.get('parent_story'))
-        self.object.save()
+        chapter = form.save(commit=False)
+        chapter.parent_story = Story.objects.get(pk=self.request.POST.get('parent_story'))
+        chapter.save()
         return HttpResponseRedirect(self.get_success_url())
 
 
