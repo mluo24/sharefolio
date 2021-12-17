@@ -10,6 +10,8 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
+
+now using Django 3.2
 """
 
 import os
@@ -236,6 +238,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# default auto primary key field for 3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -267,3 +271,5 @@ MEDIA_URL = '/media/'
 
 # Path where media is stored
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
