@@ -144,7 +144,9 @@ class Chapter(models.Model, HitCountMixin):
             return "null chapter"
 
     def get_absolute_url(self):
-        return reverse('chapter', args=[str(self.parent_story.id), str(self.parent_story.slug), str(self.id)])
+        return reverse('chapter', kwargs={'pk': self.parent_story_id,
+                                          'slug': self.parent_story.slug,
+                                          'chapter': self.id})
 
     def get_words(self):
         return len(strip_tags(self.body).split())

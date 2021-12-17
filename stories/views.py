@@ -121,7 +121,8 @@ class ChapterCreateView(LoginRequiredMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        chapter = form.save(commit=False)
+        self.object = form.save(commit=False)
+        chapter = self.object
         chapter.parent_story = Story.objects.get(pk=self.request.POST.get('parent_story'))
         chapter.save()
         return HttpResponseRedirect(self.get_success_url())
@@ -132,6 +133,13 @@ class ChapterUpdateView(LoginRequiredMixin, UpdateView):
     pk_url_kwarg = 'chapter'
     template_name = "stories/update_chapter.html"
     fields = ['title', 'description', 'body', 'status']
+
+    def get_success_url(self):
+        print(self.object)
+        return reverse('chapter',
+                       kwargs={'pk': self.object.parent_story_id,
+                               'slug': self.object.parent_story.slug,
+                               'chapter': self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
