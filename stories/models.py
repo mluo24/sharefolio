@@ -143,6 +143,9 @@ class Chapter(models.Model, HitCountMixin):
         else:
             return "null chapter"
 
+    def get_hit_count(self):
+        return self.hit_count.hits
+
     def get_absolute_url(self):
         return reverse('chapter', kwargs={'pk': self.parent_story_id,
                                           'slug': self.parent_story.slug,

@@ -1,19 +1,71 @@
-# from django.shortcuts import render
+from django.contrib.auth.models import User
 from django.shortcuts import reverse, get_object_or_404
 from django.urls import reverse_lazy
 # from django.contrib.sessions.models import Session
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, RedirectView
 from hitcount.views import HitCountDetailView
 from friendship.models import Follow, Block
+from rest_framework.decorators import action, renderer_classes
 from stories.models import Category, Story, Chapter
-# from .forms import CreateStoryForm, CreateChapterForm
-
 # from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework import viewsets, status
+from rest_framework.response import Response
+from rest_framework.renderers import JSONRenderer
+from stories.serializers import CategorySerializer, ChapterSerializer, StorySerializer, UserSerializer
 
+# API STARTS HERE
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class StoryViewSet(viewsets.ModelViewSet):
+    queryset = Story.objects.all()
+    serializer_class = StorySerializer
+
+    def create(self, request):
+        pass
+
+    @action(detail=True, methods=['get', 'post'])
+    @renderer_classes([JSONRenderer])
+    def chapters(self, request, pk):
+        story = self.get_object()
+        chapters = story.chapter_set
+
+        if request.method == 'GET':
+            serializer = ChapterSerializer(chapters, many=True, context={'request': request})
+            return Response(serializer.data)
+        else:
+            serializer = ChapterSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    @action(detail=True)
+    def published_chapters(self, request, pk):
+        story = self.get_object()
+        chapters = story.get_chapters()
+        serializer = ChapterSerializer(chapters, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+class ChapterViewSet(viewsets.ModelViewSet):
+    queryset = Chapter.objects.all()
+    serializer_class = ChapterSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+
+# NON API STARTS HERE
 
 class StoriesView(ListView):
     model = Story

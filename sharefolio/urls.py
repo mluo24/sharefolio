@@ -18,6 +18,15 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
+from rest_framework import routers
+from stories import views
+
+router = routers.DefaultRouter()
+router.register(r'stories', views.StoryViewSet)
+router.register(r'chapters', views.ChapterViewSet)
+router.register(r'categories', views.CategoryViewSet)
+router.register(r'users', views.UserViewSet)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,7 +36,9 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('comments/', include('django_comments.urls')),
     path('hitcount/', include(('hitcount.urls', 'hitcount'), namespace='hitcount')),
-    path('friendship/', include('friendship.urls'))
+    path('friendship/', include('friendship.urls')),
+    path('api/', include(router.urls)),
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
 if settings.DEBUG:
