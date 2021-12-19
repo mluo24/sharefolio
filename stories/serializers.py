@@ -7,10 +7,11 @@ from stories.models import Story, Chapter, Category
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
+    story_set = serializers.PrimaryKeyRelatedField(many=True, queryset=Story.objects.all())
 
     class Meta:
         model = User
-        fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email']
+        fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email', 'story_set']
 
 
 class AuthorListingField(serializers.RelatedField):
@@ -25,6 +26,10 @@ class StorySerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
     id = serializers.ReadOnlyField()
     author = AuthorListingField(read_only = True)
+    category = serializers.SlugRelatedField(
+        read_only=True,
+        slug_field='slug'
+     )
 
     word_count = serializers.SerializerMethodField()
     def get_word_count(self, obj):
@@ -43,9 +48,17 @@ class StorySerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
         fields = ['id', 'url', 'title', 'slug', 'description', 'author', 'status', 'category', 'tags', 'word_count', 'total_views', 'total_likes', 'created_at', 'updated_at']
 
 
+class StoryListingField(serializers.RelatedField):
+    def to_representation(self, value):
+        return {
+            "id": value.id,
+            "slug": value.slug,
+        }
+
+
 class ChapterSerializer(HitCountMixin, serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
-    # parent_story = serializers.PrimaryKeyRelatedField(read_only=True)
+    parent_story = StoryListingField(read_only=True)
 
     hit_count = serializers.SerializerMethodField()
     def get_hit_count(self, obj):
@@ -58,9 +71,12 @@ class ChapterSerializer(HitCountMixin, serializers.HyperlinkedModelSerializer):
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
-
     story_set = StorySerializer(many=True, read_only=True)
 
     class Meta:
         model = Category
         fields = ['id', 'url', 'name', 'slug', 'description', 'story_set']
+        lookup_field = 'slug'
+        extra_kwargs = {
+            'url': {'lookup_field': 'slug'}
+        }
