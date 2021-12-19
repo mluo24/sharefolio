@@ -1,5 +1,8 @@
 # Sharefolio
 
+**\*\*NOTE:\*\* for the external API, please switch branches to 'retrieving-api-data' and go to [this repository](https://github.com/mluo24/sharefolio-frontend/tree/retrieving-api-data) for the frontend**
+
+
 This project was originally made as a passion project/to test out Django, and it was partially extended for my high school senior project but was canceled due to the COVID-19 pandemic.
 
 ----
