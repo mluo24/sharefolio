@@ -5,15 +5,6 @@ from taggit.serializers import (TagListSerializerField, TaggitSerializer)
 from stories.models import Story, Chapter, Category
 
 
-class UserSerializer(serializers.HyperlinkedModelSerializer):
-    id = serializers.ReadOnlyField()
-    story_set = serializers.PrimaryKeyRelatedField(many=True, queryset=Story.objects.all())
-
-    class Meta:
-        model = User
-        fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email', 'story_set']
-
-
 class AuthorListingField(serializers.RelatedField):
     def to_representation(self, value):
         return {

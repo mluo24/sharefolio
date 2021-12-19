@@ -15,14 +15,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.renderers import JSONRenderer
-from stories.serializers import CategorySerializer, ChapterSerializer, StorySerializer, UserSerializer
+from stories.serializers import CategorySerializer, ChapterSerializer, StorySerializer
+
 
 # API STARTS HERE
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-
 
 class StoryViewSet(viewsets.ModelViewSet):
     queryset = Story.objects.all()

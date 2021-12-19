@@ -19,14 +19,19 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
-from stories import views
+from stories import views as story_views
+from base import views as base_views
 
 router = routers.DefaultRouter()
-router.register(r'stories', views.StoryViewSet)
-router.register(r'chapters', views.ChapterViewSet)
-router.register(r'categories', views.CategoryViewSet)
-router.register(r'users', views.UserViewSet)
+router.register(r'stories', story_views.StoryViewSet)
+router.register(r'chapters', story_views.ChapterViewSet)
+router.register(r'categories', story_views.CategoryViewSet)
 
+# base
+router.register(r'users', base_views.UserViewSet)
+router.register(r'auth/login', base_views.LoginViewSet, basename='auth-login')
+router.register(r'auth/register', base_views.RegistrationViewSet, basename='auth-register')
+router.register(r'auth/refresh', base_views.RefreshViewSet, basename='auth-refresh')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
