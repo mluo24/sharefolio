@@ -7,9 +7,10 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import viewsets, status
+from rest_framework.decorators import action, renderer_classes
 from base.forms import RegisterForm, PlainUserForm, UserProfileForm
 from base.models import UserProfile
-from base.serializers import LoginSerializer, RegisterSerializer, UserSerializer
+from base.serializers import LoginSerializer, RegisterSerializer, UserProfileSerializer, UserSerializer
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -23,6 +24,15 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = (IsAuthenticated,)
+
+    @action(detail=True, methods=['get'])
+    def user_profile(self, request, pk):
+        user = self.get_object()
+        userprofile = user.userprofile
+
+        if request.method == 'GET':
+            serializer = UserProfileSerializer(userprofile, context={'request': request})
+            return Response(serializer.data)
 
     def get_queryset(self):
         if self.request.user.is_superuser:

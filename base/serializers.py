@@ -4,6 +4,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
+from base.models import UserProfile
 
 from stories.models import Story
 
@@ -15,6 +16,14 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email', 'story_set']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'bio', 'location', 'birth_date']
 
 
 class LoginSerializer(TokenObtainPairSerializer):
