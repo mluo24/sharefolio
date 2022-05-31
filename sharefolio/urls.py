@@ -19,16 +19,26 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework_extensions.routers import NestedRouterMixin
+
 from stories import views as story_views
 from base import views as base_views
 
-router = routers.DefaultRouter()
+
+class NestedDefaultRouter(NestedRouterMixin, routers.DefaultRouter):
+    pass
+
+
+router = NestedDefaultRouter()
+
+# router = routers.DefaultRouter()
 router.register(r'stories', story_views.StoryViewSet)
 router.register(r'chapters', story_views.ChapterViewSet)
 router.register(r'categories', story_views.CategoryViewSet)
 
 # base
-router.register(r'users', base_views.UserViewSet)
+router.register(r'users', base_views.UserViewSet).register('userprofile', base_views.UserProfileViewSet, basename='user-userprofile', parents_query_lookups=['user'])
+
 router.register(r'auth/login', base_views.LoginViewSet, basename='auth-login')
 router.register(r'auth/register', base_views.RegistrationViewSet, basename='auth-register')
 router.register(r'auth/refresh', base_views.RefreshViewSet, basename='auth-refresh')

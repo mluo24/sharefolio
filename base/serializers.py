@@ -6,16 +6,14 @@ from django.contrib.auth.models import update_last_login
 from django.core.exceptions import ObjectDoesNotExist
 from base.models import UserProfile
 
-from stories.models import Story
-
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.ReadOnlyField()
-    story_set = serializers.PrimaryKeyRelatedField(many=True, queryset=Story.objects.all())
+    userprofile = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
 
     class Meta:
         model = User
-        fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email', 'story_set']
+        fields = ['id', 'url', 'first_name', 'last_name', 'username', 'email', 'userprofile']
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -44,11 +42,10 @@ class LoginSerializer(TokenObtainPairSerializer):
 
 class RegisterSerializer(UserSerializer):
     password = serializers.CharField(max_length=128, min_length=8, write_only=True, required=True)
-    username = serializers.CharField(required=True, write_only=True, max_length=128)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'date_joined']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'password', 'date_joined']
 
     def create(self, validated_data):
         try:

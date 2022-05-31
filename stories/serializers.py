@@ -16,27 +16,31 @@ class AuthorListingField(serializers.RelatedField):
 class StorySerializer(TaggitSerializer, serializers.HyperlinkedModelSerializer):
     tags = TagListSerializerField()
     id = serializers.ReadOnlyField()
-    author = AuthorListingField(read_only = True)
+    author = AuthorListingField(read_only=True)
     category = serializers.SlugRelatedField(
         read_only=True,
         slug_field='slug'
-     )
+    )
 
     word_count = serializers.SerializerMethodField()
+
     def get_word_count(self, obj):
         return obj.get_word_count()
 
     total_views = serializers.SerializerMethodField()
+
     def get_total_views(self, obj):
         return obj.get_total_views()
 
     total_likes = serializers.SerializerMethodField()
+
     def get_total_likes(self, obj):
         return obj.get_total_likes()
 
     class Meta:
         model = Story
-        fields = ['id', 'url', 'title', 'slug', 'description', 'author', 'status', 'category', 'tags', 'word_count', 'total_views', 'total_likes', 'created_at', 'updated_at']
+        fields = ['id', 'url', 'title', 'slug', 'description', 'author', 'status', 'category', 'tags', 'word_count',
+                  'total_views', 'total_likes', 'created_at', 'updated_at']
 
 
 class StoryListingField(serializers.RelatedField):
@@ -52,12 +56,14 @@ class ChapterSerializer(HitCountMixin, serializers.HyperlinkedModelSerializer):
     parent_story = StoryListingField(read_only=True)
 
     hit_count = serializers.SerializerMethodField()
+
     def get_hit_count(self, obj):
         return obj.get_hit_count()
 
     class Meta:
         model = Chapter
-        fields = ['id', 'url', 'parent_story', 'title', 'description', 'body', 'status', 'likes', 'hit_count', 'created_at']
+        fields = ['id', 'url', 'parent_story', 'title', 'description', 'body', 'status', 'likes', 'hit_count',
+                  'created_at']
 
 
 class CategorySerializer(serializers.HyperlinkedModelSerializer):

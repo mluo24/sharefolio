@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework import viewsets, status
 from rest_framework.decorators import action, renderer_classes
+from rest_framework_extensions.mixins import NestedViewSetMixin
+
 from base.forms import RegisterForm, PlainUserForm, UserProfileForm
 from base.models import UserProfile
 from base.serializers import LoginSerializer, RegisterSerializer, UserProfileSerializer, UserSerializer
@@ -19,32 +21,28 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 
 # API VIEW STARTS HERE
-class UserViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get']
+class UserViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
+    http_method_names = ['get', 'put']
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = (IsAuthenticated,)
-
-    @action(detail=True, methods=['get'])
-    def user_profile(self, request, pk):
-        user = self.get_object()
-        userprofile = user.userprofile
-
-        if request.method == 'GET':
-            serializer = UserProfileSerializer(userprofile, context={'request': request})
-            return Response(serializer.data)
+    # permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            return User.objects.all()
+        # if self.request.user.is_superuser:
+        return User.objects.all()
 
     def get_object(self):
         lookup_field_value = self.kwargs[self.lookup_field]
 
-        obj = User.objects.get(lookup_field_value)
+        obj = User.objects.get(pk=lookup_field_value)
         self.check_object_permissions(self.request, obj)
 
         return obj
+
+
+class UserProfileViewSet(NestedViewSetMixin, viewsets.ModelViewSet):
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
 
 
 class LoginViewSet(viewsets.ModelViewSet, TokenObtainPairView):
@@ -101,10 +99,7 @@ class RefreshViewSet(viewsets.ViewSet, TokenRefreshView):
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
-
 # PREVIOUS ROUTES START HERE
-
-
 
 def home(request):
     return render(request, template_name="base/index.html")
